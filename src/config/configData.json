@@ -1,0 +1,37 @@
+{
+  "model:system": {
+    "hostname": "-invalid-hostname-",
+    "location": "",
+    "max-sessions": 200000
+  },
+
+  "model:interface": {
+    "name": "ethernetABC",
+    "ip-address": "999.999.999.999",
+    "subnet-mask": "255.0.0",
+    "mtu": 20,
+    "enabled": "YES",
+    "speed": "5G"
+  },
+
+  "model:qos": {
+    "enabled": true,
+    "default-priority": 10,
+    "bandwidth-limit": 0,
+    "cpu-threshold": 200,
+    "memory-threshold": -1
+  },
+
+  "model:security": {
+    "ssh-enabled": "enabled",
+    "ssh-port": 70000,
+    "allowed-ips": [
+      "10.0.0.1",
+      "300.300.300.300",
+      "not-an-ip"
+    ],
+    "password-min-length": 5,
+    "session-timeout": 30,
+    "max-login-attempts": 20
+  }
+}

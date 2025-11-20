@@ -1,0 +1,14 @@
+[tool.poetry]
+name = "yang-validator-generator"
+version = "0.1.0"
+description = "A generator for YANG model validation functions."
+authors = ["Your Name <youremail@example.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+libyang = "^0.1.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

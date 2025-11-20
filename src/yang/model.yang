@@ -1,0 +1,223 @@
+module model {
+  namespace "http://example.com/network-device";
+  prefix nd;
+
+  organization "Example Networks";
+  contact "admin@example.com";
+  description
+    "YANG model for network device configuration with input validation";
+
+  revision 2025-11-18 {
+    description "Initial revision with validation rules";
+  }
+
+  /*******************************
+   *  Typedefs with constraints  *
+   *******************************/
+  typedef ipv4-address {
+    type string {
+      pattern '(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.){3}'
+            + '([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])';
+    }
+    description "IPv4 address in dotted-quad notation";
+  }
+
+  typedef port-number {
+    type uint16 {
+      range "1..65535";
+    }
+    description "Valid TCP/UDP port number";
+  }
+
+  typedef percentage {
+    type uint8 {
+      range "0..100";
+    }
+    description "Percentage value (0–100%)";
+  }
+
+  /*******************************
+   *  SYSTEM Container           *
+   *******************************/
+  container system {
+    description "System-level configuration";
+
+    leaf hostname {
+      type string {
+        length "1..255";
+        pattern '[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?';
+      }
+      mandatory true;
+      description "Alphanumeric hostname; hyphens allowed but not at edges.";
+    }
+
+    leaf domain-name {
+      type string {
+        length "1..253";
+        pattern '([a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?\.)*'
+              + '[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?';
+      }
+      description "Standard domain name format.";
+    }
+
+    leaf location {
+      type string {
+        length "1..128";
+      }
+      description "Physical location of the device.";
+    }
+
+    leaf max-sessions {
+      type uint32 {
+        range "1..10000";
+      }
+      default 1000;
+      description "Maximum concurrent sessions.";
+    }
+  }
+
+  /*******************************
+   *  INTERFACE Container        *
+   *******************************/
+  container interface {
+    description "Network interface configuration";
+
+    leaf name {
+      type string {
+        length "1..32";
+        pattern 'eth[0-9]+|gi[0-9]+/[0-9]+';
+      }
+      mandatory true;
+      description "Interface name (e.g., eth0, gi0/1).";
+    }
+
+    leaf ip-address {
+      type ipv4-address;
+      mandatory true;
+      description "IPv4 address of the interface.";
+    }
+
+    leaf subnet-mask {
+      type ipv4-address;
+      mandatory true;
+      description "Subnet mask for the interface.";
+    }
+
+    leaf mtu {
+      type uint16 {
+        range "68..9216";
+      }
+      default 1500;
+      description "MTU size in bytes.";
+    }
+
+    leaf enabled {
+      type boolean;
+      default true;
+      description "Administrative state of the interface.";
+    }
+
+    leaf speed {
+      type enumeration {
+        enum "10M" { value 0; }
+        enum "100M" { value 1; }
+        enum "1G" { value 2; }
+        enum "10G" { value 3; }
+        enum "auto" { value 4; }
+      }
+      default "auto";
+      description "Interface speed setting.";
+    }
+  }
+
+  /*******************************
+   *  QoS Container              *
+   *******************************/
+  container qos {
+    description "Quality of Service configuration";
+
+    leaf enabled {
+      type boolean;
+      default false;
+      description "Enable/disable QoS.";
+    }
+
+    leaf default-priority {
+      type uint8 {
+        range "0..7";
+      }
+      default 0;
+      description "Priority level (0–7).";
+    }
+
+    leaf bandwidth-limit {
+      type uint32 {
+        range "1..100000";
+      }
+      units "Mbps";
+      description "Maximum bandwidth limit.";
+    }
+
+    leaf cpu-threshold {
+      type percentage;
+      default 80;
+      description "CPU threshold percentage.";
+    }
+
+    leaf memory-threshold {
+      type percentage;
+      default 85;
+      description "Memory utilization threshold.";
+    }
+  }
+
+  /*******************************
+   *  SECURITY Container         *
+   *******************************/
+  container security {
+    description "Security and access control configuration";
+
+    leaf ssh-enabled {
+      type boolean;
+      default true;
+      description "Enable SSH access.";
+    }
+
+    leaf ssh-port {
+      type port-number;
+      default 22;
+      description "SSH listening port.";
+    }
+
+    leaf-list allowed-ips {
+      type ipv4-address;
+      max-elements 100;
+      description "Allowed management IP addresses.";
+    }
+
+    leaf password-min-length {
+      type uint8 {
+        range "8..64";
+      }
+      default 12;
+      description "Minimum password length.";
+    }
+
+    leaf session-timeout {
+      type uint32 {
+        range "60..86400";
+      }
+      default 900;
+      units "seconds";
+      description "Idle session timeout.";
+    }
+
+    leaf max-login-attempts {
+      type uint8 {
+        range "1..10";
+      }
+      default 3;
+      description "Failed login attempt limit.";
+    }
+  }
+}
